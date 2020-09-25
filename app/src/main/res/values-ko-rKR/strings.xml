@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">집가고싶다</string>
+    <string name="add_widget">위젯 추가</string>
+    <string name="appwidget_text">EXAMPLE</string>
+</resources>

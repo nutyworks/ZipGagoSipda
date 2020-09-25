@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:icon="@drawable/ic_baseline_brightness_high_24"
+        android:title="Change theme"
+        android:id="@+id/change_theme_btn"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:icon="@drawable/ic_baseline_date_range_24"
+        android:title="Change date"
+        android:id="@+id/change_date_btn"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:icon="@drawable/ic_baseline_settings_24"
+        android:title="Settings"
+        android:id="@+id/settings_btn"
+        app:showAsAction="ifRoom" />
+</menu>
