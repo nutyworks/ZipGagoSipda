@@ -13,9 +13,9 @@
         android:id="@+id/change_date_btn"
         app:showAsAction="ifRoom" />
 
-    <item
-        android:icon="@drawable/ic_baseline_settings_24"
-        android:title="Settings"
-        android:id="@+id/settings_btn"
-        app:showAsAction="ifRoom" />
+<!--    <item-->
+<!--        android:icon="@drawable/ic_baseline_settings_24"-->
+<!--        android:title="Settings"-->
+<!--        android:id="@+id/settings_btn"-->
+<!--        app:showAsAction="ifRoom" />-->
 </menu>

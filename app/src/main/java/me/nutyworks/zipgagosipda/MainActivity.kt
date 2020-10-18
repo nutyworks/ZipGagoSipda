@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var toolbar: Toolbar
 
     private val date = Calendar.getInstance(TimeZone.getDefault())
-    var targetMillis = 1601355600000
+    var targetMillis = 1604030400000
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -126,10 +126,10 @@ class MainActivity : AppCompatActivity() {
                 datePicker.show()
                 true
             }
-            R.id.settings_btn -> {
-                startActivity(Intent(this, SettingsActivity::class.java))
-                true
-            }
+//            R.id.settings_btn -> {
+//                startActivity(Intent(this, SettingsActivity::class.java))
+//                true
+//            }
             else -> super.onOptionsItemSelected(item)
         }
     }
