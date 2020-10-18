@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var toolbar: Toolbar
 
     private val date = Calendar.getInstance(TimeZone.getDefault())
-    var targetMillis = 1604030400000
+    var targetMillis = 1603490400000
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
