@@ -3,4 +3,5 @@
     <string name="app_name">집가고싶다</string>
     <string name="add_widget">위젯 추가</string>
     <string name="appwidget_text">EXAMPLE</string>
+    <string name="time_display">%d초\n%d분\n%d시간\n%d일</string>
 </resources>

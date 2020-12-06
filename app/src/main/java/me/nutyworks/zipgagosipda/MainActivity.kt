@@ -3,9 +3,11 @@ package me.nutyworks.zipgagosipda
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.DatePicker
@@ -14,8 +16,10 @@ import android.widget.TimePicker
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.edit
 import androidx.core.view.forEach
 import java.util.*
+import kotlin.properties.Delegates
 
 
 class MainActivity : AppCompatActivity() {
@@ -26,6 +30,9 @@ class MainActivity : AppCompatActivity() {
 
     private val date = Calendar.getInstance(TimeZone.getDefault())
     var targetMillis = 1606287600000
+
+    var timer: Timer by Delegates.notNull()
+    var targetTimeTimerTask: TimerTask by Delegates.notNull()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,15 +45,34 @@ class MainActivity : AppCompatActivity() {
         toolbar.setTitle(R.string.app_name)
         setSupportActionBar(toolbar)
 
-        Timer().schedule(object: TimerTask() {
-            override fun run() {
-                runOnUiThread {
-                    val remaining = targetMillis - System.currentTimeMillis()
+        targetMillis = getSharedPreferences("TIME_PREF", MODE_PRIVATE)
+                            .getLong("TARGET_PREF", targetMillis)
+    }
 
-                    rem.text = "${remaining / 1000}초\nor ${remaining / 60000}분\nor ${remaining / 60000 / 60}시간\nor ${remaining / 60000 / 60 / 24}일"
+    override fun onResume() {
+        super.onResume()
+        timer = Timer().let {
+            it.schedule(object: TimerTask() {
+                override fun run() {
+                    runOnUiThread {
+                        val remaining = targetMillis - System.currentTimeMillis()
+
+                        rem.text = getString(R.string.time_display).format(
+                            remaining / 1000,
+                            remaining / 60000,
+                            remaining / 60000 / 60,
+                            remaining / 60000 / 60 / 24
+                        )
+                    }
                 }
-            }
-        }, 0, 1000)
+            }, 0, 1000)
+            it
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        timer.cancel()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -112,6 +138,10 @@ class MainActivity : AppCompatActivity() {
                                 combinedCal.set(Calendar.SECOND, 0)
                                 combinedCal.set(Calendar.MILLISECOND, 0)
                                 targetMillis = combinedCal.timeInMillis - 32400000
+                                getSharedPreferences("TIME_PREF", MODE_PRIVATE).edit {
+                                    putLong("TARGET_PREF", targetMillis)
+                                    commit()
+                                }
 //                                Log.d("ADF", "onOptionsItemSelected: $targetMillis")
                             },
                             date.get(Calendar.HOUR_OF_DAY),

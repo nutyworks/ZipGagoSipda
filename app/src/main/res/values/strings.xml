@@ -20,4 +20,7 @@
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="format_title">Format</string>
     <string name="display_header">Display</string>
+
+    <!-- App Preferences -->
+    <string name="time_display">%ds\n%dm\n%dh\n%dd</string>
 </resources>
