@@ -22,5 +22,6 @@
     <string name="display_header">Display</string>
 
     <!-- App Preferences -->
-    <string name="time_display">%ds\n%dm\n%dh\n%dd</string>
+    <string name="time_display_justdoit">%ds\n%dm\n%dh\n%dd</string>
+    <string name="time_display_justdoit2">%dd %dh %dm %ds</string>
 </resources>
