@@ -1,3 +1,4 @@
+//1970/01/01 00:00:00
 package me.nutyworks.zipgagosipda
 
 import android.app.DatePickerDialog
@@ -18,9 +19,9 @@ import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.edit
 import androidx.core.view.forEach
+import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 import kotlin.properties.Delegates
-
 
 class MainActivity : AppCompatActivity() {
     private var isDark = false
@@ -33,6 +34,8 @@ class MainActivity : AppCompatActivity() {
 
     var timer: Timer by Delegates.notNull()
     var targetTimeTimerTask: TimerTask by Delegates.notNull()
+
+    private var isSwitch = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +50,37 @@ class MainActivity : AppCompatActivity() {
 
         targetMillis = getSharedPreferences("TIME_PREF", MODE_PRIVATE)
                             .getLong("TARGET_PREF", targetMillis)
+
+        layout_thing.setOnClickListener() {
+            isSwitch = !isSwitch
+            clickclick()
+        }
+    }
+
+    fun clickclick() {
+        val remaining = targetMillis - System.currentTimeMillis()
+        fun justdoit() {
+            rem.text = getString(R.string.time_display_justdoit).format(
+                remaining / 1000,
+                remaining / 60000,
+                remaining / 60000 / 60,
+                remaining / 60000 / 60 / 24
+            )
+        }
+
+        fun justdoit2() {
+            rem.text = getString(R.string.time_display_justdoit2).format(
+                remaining / 60000 / 60 / 24,
+                remaining / 60000 / 60 % 24,
+                remaining / 60000 % 60,
+                remaining / 1000 % 60
+            )
+        }
+        if (isSwitch) {
+            justdoit()
+        } else {
+            justdoit2()
+        }
     }
 
     override fun onResume() {
@@ -55,14 +89,7 @@ class MainActivity : AppCompatActivity() {
             it.schedule(object: TimerTask() {
                 override fun run() {
                     runOnUiThread {
-                        val remaining = targetMillis - System.currentTimeMillis()
-
-                        rem.text = getString(R.string.time_display).format(
-                            remaining / 1000,
-                            remaining / 60000,
-                            remaining / 60000 / 60,
-                            remaining / 60000 / 60 / 24
-                        )
+                        clickclick()
                     }
                 }
             }, 0, 1000)
