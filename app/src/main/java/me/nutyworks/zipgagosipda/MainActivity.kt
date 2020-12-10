@@ -1,14 +1,10 @@
-//1970/01/01 00:00:00
 package me.nutyworks.zipgagosipda
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.DatePicker
@@ -35,7 +31,7 @@ class MainActivity : AppCompatActivity() {
     var timer: Timer by Delegates.notNull()
     var targetTimeTimerTask: TimerTask by Delegates.notNull()
 
-    private var isSwitch = true
+    private var isTouched = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,14 +48,14 @@ class MainActivity : AppCompatActivity() {
                             .getLong("TARGET_PREF", targetMillis)
 
         layout_thing.setOnClickListener() {
-            isSwitch = !isSwitch
-            clickclick()
+            isTouched = !isTouched
+            changeForm()
         }
     }
 
-    fun clickclick() {
+    fun changeForm() {
         val remaining = targetMillis - System.currentTimeMillis()
-        fun justdoit() {
+        fun fullDate() {
             rem.text = getString(R.string.time_display_justdoit).format(
                 remaining / 1000,
                 remaining / 60000,
@@ -68,7 +64,7 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        fun justdoit2() {
+        fun asEach() {
             rem.text = getString(R.string.time_display_justdoit2).format(
                 remaining / 60000 / 60 / 24,
                 remaining / 60000 / 60 % 24,
@@ -76,10 +72,10 @@ class MainActivity : AppCompatActivity() {
                 remaining / 1000 % 60
             )
         }
-        if (isSwitch) {
-            justdoit()
+        if (isTouched) {
+            fullDate()
         } else {
-            justdoit2()
+            asEach()
         }
     }
 
@@ -89,7 +85,7 @@ class MainActivity : AppCompatActivity() {
             it.schedule(object: TimerTask() {
                 override fun run() {
                     runOnUiThread {
-                        clickclick()
+                        changeForm()
                     }
                 }
             }, 0, 1000)
