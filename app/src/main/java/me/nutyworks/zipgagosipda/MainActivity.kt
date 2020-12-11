@@ -33,6 +33,13 @@ class MainActivity : AppCompatActivity() {
 
     private var isTouched = true
 
+
+    enum class FormType {
+        AS_EACH,
+        FULL_DATE,
+    }
+    private var formType = FormType.AS_EACH
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -56,7 +63,7 @@ class MainActivity : AppCompatActivity() {
     fun changeForm() {
         val remaining = targetMillis - System.currentTimeMillis()
         fun fullDate() {
-            rem.text = getString(R.string.time_display_justdoit).format(
+            rem.text = getString(R.string.fullDate).format(
                 remaining / 1000,
                 remaining / 60000,
                 remaining / 60000 / 60,
@@ -65,7 +72,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         fun asEach() {
-            rem.text = getString(R.string.time_display_justdoit2).format(
+            rem.text = getString(R.string.as_each).format(
                 remaining / 60000 / 60 / 24,
                 remaining / 60000 / 60 % 24,
                 remaining / 60000 % 60,
@@ -102,10 +109,10 @@ class MainActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.my_menu , menu)
 
         val hour = date.get(Calendar.HOUR_OF_DAY)
-        if (hour > 20 || hour < 7) {
-            setDark()
-        } else {
-            setLight()
+
+        formType = when(formType) {
+            FormType.AS_EACH -> FormType.FULL_DATE
+            FormType.FULL_DATE -> FormType.AS_EACH
         }
         return true
     }
