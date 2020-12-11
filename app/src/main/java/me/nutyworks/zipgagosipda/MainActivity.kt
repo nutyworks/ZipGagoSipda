@@ -15,21 +15,38 @@ import androidx.core.view.forEach
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 import kotlin.properties.Delegates
+import kotlin.reflect.KProperty
 
 class MainActivity : AppCompatActivity() {
-    private var isDark = false
-    private val date = Calendar.getInstance(TimeZone.getDefault())
-    private var timer: Timer by Delegates.notNull()
-    private var targetTimeTimerTask: TimerTask by Delegates.notNull()
-
-    var targetMillis = 1606287600000
 
     enum class FormType {
         AS_EACH,
         FULL_DATE,
     }
 
-    private var formType = FormType.AS_EACH
+    companion object {
+        private const val DISPLAY_PREF = "DisplayPreference"
+        private const val TARGET_MILLIS_PREF = "TargetMillis"
+        private const val THEME_PREF = "Theme"
+        private const val FORM_TYPE_PREF = "FormType"
+    }
+
+    private var targetMillis by Delegates.observable(
+        1606287600000,
+        getSaveSharedPreferencesFunction(DISPLAY_PREF, TARGET_MILLIS_PREF)
+    )
+
+    private var isDark by Delegates.observable(
+        true,
+        getSaveSharedPreferencesFunction(DISPLAY_PREF, THEME_PREF)
+    )
+    private var formType by Delegates.observable(
+        FormType.AS_EACH,
+        getSaveSharedPreferencesFunction(DISPLAY_PREF, FORM_TYPE_PREF)
+    )
+
+    private val date = Calendar.getInstance(TimeZone.getDefault())
+    private var timer: Timer by Delegates.notNull()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,15 +55,43 @@ class MainActivity : AppCompatActivity() {
         my_toolbar.setTitle(R.string.app_name)
         setSupportActionBar(my_toolbar)
 
-        targetMillis = getSharedPreferences("TIME_PREF", MODE_PRIVATE)
-            .getLong("TARGET_PREF", targetMillis)
+        getSharedPreferences(DISPLAY_PREF, MODE_PRIVATE).run {
+            targetMillis = getLong(TARGET_MILLIS_PREF, targetMillis)
+            isDark = getBoolean(THEME_PREF, isDark)
+            formType = getString(FORM_TYPE_PREF, formType.toString())?.let { FormType.valueOf(it) }
+                ?: FormType.AS_EACH
+        }
 
-        layout_thing.setOnClickListener() {
+        layout_thing.setOnClickListener {
             formType = when (formType) {
                 FormType.AS_EACH -> FormType.FULL_DATE
                 FormType.FULL_DATE -> FormType.AS_EACH
             }
             changeForm()
+        }
+    }
+
+    private fun <T> getSaveSharedPreferencesFunction(
+        namespace: String,
+        key: String
+    ): (KProperty<*>, T, T) -> Unit {
+        return { _, _, newValue ->
+            getSharedPreferences(namespace, MODE_PRIVATE).edit {
+                fun putAsToString(key: String, value: Any) {
+                    putString(key, value.toString())
+                }
+
+                when (newValue) {
+                    is Boolean -> ::putBoolean
+                    is Float -> ::putFloat
+                    is Int -> ::putInt
+                    is Long -> ::putLong
+                    is String -> ::putString
+                    is Set<*> -> if (newValue.first() is String) ::putStringSet else ::putAsToString
+                    else -> ::putAsToString
+                }(key, newValue)
+                commit()
+            }
         }
     }
 
@@ -97,17 +142,16 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.my_menu, menu)
 
-        val hour = date.get(Calendar.HOUR_OF_DAY)
-
-        if (hour > 20 || hour < 7) {
+        if (isDark) {
             setDark()
         } else {
             setLight()
         }
+
         return true
     }
 
-    fun setLight() {
+    private fun setLight() {
         remaining_time.setTextColor(getColor(R.color.black))
         layout_thing.setBackgroundColor(getColor(R.color.white))
         my_toolbar.setTitleTextColor(getColor(R.color.black))
@@ -119,7 +163,7 @@ class MainActivity : AppCompatActivity() {
         isDark = false
     }
 
-    fun setDark() {
+    private fun setDark() {
         remaining_time.setTextColor(getColor(R.color.white))
         layout_thing.setBackgroundColor(getColor(R.color.black))
         my_toolbar.setTitleTextColor(getColor(R.color.white))
@@ -157,10 +201,6 @@ class MainActivity : AppCompatActivity() {
                                 combinedCal.set(Calendar.SECOND, 0)
                                 combinedCal.set(Calendar.MILLISECOND, 0)
                                 targetMillis = combinedCal.timeInMillis - 32400000
-                                getSharedPreferences("TIME_PREF", MODE_PRIVATE).edit {
-                                    putLong("TARGET_PREF", targetMillis)
-                                    commit()
-                                }
                             },
                             date.get(Calendar.HOUR_OF_DAY),
                             date.get(Calendar.MINUTE),
