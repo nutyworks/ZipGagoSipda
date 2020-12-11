@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity() {
     fun changeForm() {
         val remaining = targetMillis - System.currentTimeMillis()
         fun fullDate() {
-            rem.text = getString(R.string.fullDate).format(
+            rem.text = getString(R.string.full_date).format(
                 remaining / 1000,
                 remaining / 60000,
                 remaining / 60000 / 60,
