@@ -22,5 +22,6 @@
     <string name="display_header">Display</string>
 
     <!-- App Preferences -->
-    <string name="time_display">%ds\n%dm\n%dh\n%dd</string>
+    <string name="full_date">%ds\n%dm\n%dh\n%dd</string>
+    <string name="as_each">%dd %dh %dm %ds</string>
 </resources>

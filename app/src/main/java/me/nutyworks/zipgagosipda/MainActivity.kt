@@ -2,12 +2,9 @@ package me.nutyworks.zipgagosipda
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.DatePicker
@@ -18,9 +15,9 @@ import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.edit
 import androidx.core.view.forEach
+import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 import kotlin.properties.Delegates
-
 
 class MainActivity : AppCompatActivity() {
     private var isDark = false
@@ -33,6 +30,15 @@ class MainActivity : AppCompatActivity() {
 
     var timer: Timer by Delegates.notNull()
     var targetTimeTimerTask: TimerTask by Delegates.notNull()
+
+    private var isTouched = true
+
+
+    enum class FormType {
+        AS_EACH,
+        FULL_DATE,
+    }
+    private var formType = FormType.AS_EACH
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +53,37 @@ class MainActivity : AppCompatActivity() {
 
         targetMillis = getSharedPreferences("TIME_PREF", MODE_PRIVATE)
                             .getLong("TARGET_PREF", targetMillis)
+
+        layout_thing.setOnClickListener() {
+            isTouched = !isTouched
+            changeForm()
+        }
+    }
+
+    fun changeForm() {
+        val remaining = targetMillis - System.currentTimeMillis()
+        fun fullDate() {
+            rem.text = getString(R.string.full_date).format(
+                remaining / 1000,
+                remaining / 60000,
+                remaining / 60000 / 60,
+                remaining / 60000 / 60 / 24
+            )
+        }
+
+        fun asEach() {
+            rem.text = getString(R.string.as_each).format(
+                remaining / 60000 / 60 / 24,
+                remaining / 60000 / 60 % 24,
+                remaining / 60000 % 60,
+                remaining / 1000 % 60
+            )
+        }
+        if (isTouched) {
+            fullDate()
+        } else {
+            asEach()
+        }
     }
 
     override fun onResume() {
@@ -55,14 +92,7 @@ class MainActivity : AppCompatActivity() {
             it.schedule(object: TimerTask() {
                 override fun run() {
                     runOnUiThread {
-                        val remaining = targetMillis - System.currentTimeMillis()
-
-                        rem.text = getString(R.string.time_display).format(
-                            remaining / 1000,
-                            remaining / 60000,
-                            remaining / 60000 / 60,
-                            remaining / 60000 / 60 / 24
-                        )
+                        changeForm()
                     }
                 }
             }, 0, 1000)
@@ -79,10 +109,10 @@ class MainActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.my_menu , menu)
 
         val hour = date.get(Calendar.HOUR_OF_DAY)
-        if (hour > 20 || hour < 7) {
-            setDark()
-        } else {
-            setLight()
+
+        formType = when(formType) {
+            FormType.AS_EACH -> FormType.FULL_DATE
+            FormType.FULL_DATE -> FormType.AS_EACH
         }
         return true
     }
