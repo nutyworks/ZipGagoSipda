@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private var targetMillis by Delegates.observable(
-        1608786000000,
+        System.currentTimeMillis() + 604_804_000,
         getSaveSharedPreferencesFunction<Long>(DISPLAY_PREF, TARGET_MILLIS_PREF)
                 then this::updateWidget
     )
