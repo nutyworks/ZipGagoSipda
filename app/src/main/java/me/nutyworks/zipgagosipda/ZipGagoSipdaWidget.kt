@@ -3,6 +3,8 @@ package me.nutyworks.zipgagosipda
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
+import android.content.Intent
 import android.widget.RemoteViews
 
 /**
@@ -20,6 +22,17 @@ class ZipGagoSipdaWidget : AppWidgetProvider() {
         }
     }
 
+    override fun onReceive(context: Context?, intent: Intent?) {
+        super.onReceive(context, intent)
+        context?.let { nnContext ->
+            onUpdate(
+                nnContext,
+                AppWidgetManager.getInstance(nnContext),
+                intent?.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS) ?: return
+            )
+        }
+    }
+
     override fun onEnabled(context: Context) {
         // Enter relevant functionality for when the first widget is created
     }
@@ -34,7 +47,11 @@ internal fun updateAppWidget(
     appWidgetManager: AppWidgetManager,
     appWidgetId: Int
 ) {
-    val remaining = 1601355600000 - System.currentTimeMillis()
+    val remaining =
+        context.getSharedPreferences(DISPLAY_PREF, MODE_PRIVATE)
+            .getLong(TARGET_MILLIS_PREF, System.currentTimeMillis() + 604_800_000).let {
+                it - System.currentTimeMillis()
+            }
     val widgetText = "집 가기 ${remaining / 60000 / 60}시간 전"
 
     // Construct the RemoteViews object

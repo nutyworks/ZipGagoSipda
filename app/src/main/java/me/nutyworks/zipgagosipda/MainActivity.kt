@@ -2,6 +2,9 @@ package me.nutyworks.zipgagosipda
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
+import android.content.Intent
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
@@ -17,6 +20,11 @@ import java.util.*
 import kotlin.properties.Delegates
 import kotlin.reflect.KProperty
 
+const val DISPLAY_PREF = "DisplayPreference"
+const val TARGET_MILLIS_PREF = "TargetMillis"
+const val THEME_PREF = "Theme"
+const val FORM_TYPE_PREF = "FormType"
+
 class MainActivity : AppCompatActivity() {
 
     enum class FormType {
@@ -24,16 +32,10 @@ class MainActivity : AppCompatActivity() {
         FULL_DATE,
     }
 
-    companion object {
-        private const val DISPLAY_PREF = "DisplayPreference"
-        private const val TARGET_MILLIS_PREF = "TargetMillis"
-        private const val THEME_PREF = "Theme"
-        private const val FORM_TYPE_PREF = "FormType"
-    }
-
     private var targetMillis by Delegates.observable(
-        1606287600000,
-        getSaveSharedPreferencesFunction(DISPLAY_PREF, TARGET_MILLIS_PREF)
+        1608786000000,
+        getSaveSharedPreferencesFunction<Long>(DISPLAY_PREF, TARGET_MILLIS_PREF)
+                then this::updateWidget
     )
 
     private var isDark by Delegates.observable(
@@ -92,6 +94,19 @@ class MainActivity : AppCompatActivity() {
                 }(key, newValue)
                 commit()
             }
+        }
+    }
+
+    private fun updateWidget() {
+        Intent(this, ZipGagoSipdaWidget::class.java).run {
+            action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+            putExtra(
+                AppWidgetManager.EXTRA_APPWIDGET_IDS,
+                AppWidgetManager.getInstance(application)
+                    .getAppWidgetIds(ComponentName(application, ZipGagoSipdaWidget::class.java))
+            )
+        }.let {
+            sendBroadcast(it)
         }
     }
 
@@ -218,3 +233,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
+
+private infix fun <P1A, P1B, P1C, R1, R2> ((P1A, P1B, P1C) -> R1).then(other: () -> R2): (P1A, P1B, P1C) -> R2 =
+    { p1A, p1B, p1C ->
+        this(p1A, p1B, p1C)
+        other()
+    }
