@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         getSaveSharedPreferencesFunction(DISPLAY_PREF, THEME_PREF)
     )
     private var formType by Delegates.observable(
-        FormType.AS_EACH,
+        FormType.FULL_DATE,
         getSaveSharedPreferencesFunction(DISPLAY_PREF, FORM_TYPE_PREF)
     )
 
